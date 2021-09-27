@@ -1,0 +1,55 @@
+---
+# tasks file for setup_apache_tomcat
+- name: Update
+  apt:
+    update_cache: yes
+- name: Installing JDK
+  apt: 
+    name: default-jdk
+    state: latest
+
+- name: Add Group Tomcat
+  group: name=tomcat
+
+- name : Add users to tomcat group
+  user: name=tomcat group=tomcat home=/user/share/tomcat
+  become: true
+  become_method: sudo
+
+- name: Installing curl
+  apt: 
+    name: curl
+    state: latest
+
+- name: Download Apache tomcat repository files
+  shell: curl -O https://archive.apache.org/dist/tomcat/tomcat-8/v8.5.3/bin/apache-tomcat-8.5.3.tar.gz
+  args: 
+    chdir: /tmp
+- name: Create apache home directory
+  command: mkdir /opt/tomcat
+  args:
+    creates: /opt/tomcat
+
+- name: Extracting Apache tomcat tar file
+  shell: tar -xvzf /tmp/apache-tomcat-8.5.3.tar.gz -C /opt/tomcat
+- name: Updating permission 
+  shell: "{{item}}"
+  args:
+    warn: false
+  with_items:
+    - chgrp -R tomcat /opt/tomcat
+    - chmod -R g+r /opt/tomcat/apache-tomcat-8.5.3/conf
+    - chmod g+x /opt/tomcat/apache-tomcat-8.5.3/conf
+    - chown -R tomcat /opt/tomcat/apache-tomcat-8.5.3/webapps
+
+- name: Copy Tomcat service from local to remote
+  copy: 
+   src: /tmp/tomcat.service
+   dest: /etc/systemd/system
+   mode: 0755
+  
+- name: Start and enable tomcat service
+  service:
+    name: tomcat
+    enabled: yes
+    state: started

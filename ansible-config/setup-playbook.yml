@@ -1,0 +1,6 @@
+---
+- name: Use the role setup_apache_tomcat
+  hosts: kslave1
+  roles:
+  - role: setup_apache_tomcat        
+  - role: setup_apache_maven  

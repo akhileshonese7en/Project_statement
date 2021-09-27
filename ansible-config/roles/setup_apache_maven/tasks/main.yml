@@ -1,0 +1,19 @@
+---
+# tasks file for setup_apache_maven
+- name: Install dependencies
+  apt: 
+    name: software-properties-common
+    state: present
+
+- name: Download Apache maven repository file
+  shell: wget http://apache.mirror.digitalpacific.com.au/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
+  args: 
+    chdir: /tmp
+
+- name: Extract Apache tomcat tar file
+  shell: tar -xvzf /tmp/apache-maven-3.3.9-bin.tar.gz -C /opt 
+
+- name: Install apache
+  shell: update-alternatives --install /usr/bin/mvn maven /opt/apache-maven-3.3.9/bin/mvn 1001
+  args:
+    warn: false  
