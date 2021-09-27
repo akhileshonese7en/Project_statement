@@ -1,0 +1,4 @@
+- name: Use the role docker
+  hosts: kslave1
+  roles:
+  - role: configure_docker
